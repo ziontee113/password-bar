@@ -1,13 +1,39 @@
 import { useEffect, useState } from "preact/hooks";
 
 const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
-// const password = "69420";
+const password = "69420";
+
+enum State {
+  Typing,
+  Correct,
+  Error,
+}
 
 export function App() {
   const [sequence, setSequence] = useState("");
+  const [state, setState] = useState(State.Typing);
 
   function updateSequence(number: number) {
-    setSequence((prevSequence) => prevSequence + number.toString());
+    // had to use `prevSequence` variable inside `setSequence()` because
+    // `updateSequence()` is called both from onClick events and `handleKeyDown()`
+    setSequence((prevSequence) => {
+      let newSequence = prevSequence + number.toString();
+
+      let newState = State.Typing;
+      if (newSequence.length === password.length) {
+        if (newSequence === password) {
+          newState = State.Correct;
+        } else {
+          newState = State.Error;
+        }
+      }
+      setState(newState);
+
+      if (newState !== State.Typing) {
+        newSequence = "";
+      }
+      return newSequence;
+    });
   }
 
   function removeLastSequenceCharacter() {
@@ -40,7 +66,15 @@ export function App() {
   return (
     <div className="flex h-screen select-none flex-col items-center justify-center bg-stone-900 text-white">
       <h1 className="pb-4 text-4xl">
-        Sequence is : {sequence === "" ? "empty" : sequence}
+        {(() => {
+          if (state === State.Correct) {
+            return "Access Granted";
+          } else if (state === State.Error) {
+            return "Incorrect Password";
+          } else if (state === State.Typing) {
+            return `Sequence is: ${sequence === "" ? "empty" : sequence}`;
+          }
+        })()}
       </h1>
       <div>
         <button
