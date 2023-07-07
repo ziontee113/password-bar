@@ -18,22 +18,25 @@ export function App() {
     // `updateSequence()` is called both from onClick events and `handleKeyDown()`
     setSequence((prevSequence) => {
       let newSequence = prevSequence + number.toString();
-
-      let newState = State.Typing;
-      if (newSequence.length === password.length) {
-        if (newSequence === password) {
-          newState = State.Correct;
-        } else {
-          newState = State.Error;
-        }
-      }
-      setState(newState);
-
+      let newState = setNewState(newSequence);
       if (newState !== State.Typing) {
         newSequence = "";
       }
       return newSequence;
     });
+  }
+
+  function setNewState(newSequence: string) {
+    let newState = State.Typing;
+    if (newSequence.length === password.length) {
+      if (newSequence === password) {
+        newState = State.Correct;
+      } else {
+        newState = State.Error;
+      }
+    }
+    setState(newState);
+    return newState;
   }
 
   function removeLastSequenceCharacter() {
